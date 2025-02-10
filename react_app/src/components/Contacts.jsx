@@ -1,12 +1,13 @@
 import { useState } from "react"
 import inputs from "../constants/inputs";
 import ContactList from "./ContactList"
-
+import { v4 } from "uuid";
+import styles from "./Contacts.module.css";
 function Contacts() {
     const [contacts , setContacts] = useState([])
     const [alert , setAlert] = useState("");
     const [contact,setContact] = useState({
-        name:"" , lastName:"" , email:"" , phone:"" ,
+        name:"" , lastName:"" , email:"" , phone:"" ,id:"",
     })
 
     const addHandler = () => {
@@ -15,7 +16,8 @@ function Contacts() {
             return;
         }
         setAlert("");
-        setContacts((contacts) => [...contacts , contact])
+        const newContact = {...contact , id: v4()}
+        setContacts((contacts) => [...contacts , newContact])
         setContact({
             name:"" , lastName:"" , email:"" , phone:"" ,
         })
@@ -28,9 +30,13 @@ function Contacts() {
         setContact((contact) => ({...contact , [name]:value}))
 
     }
+    const deleteHandler = (id) => {
+        const newContacts = contacts.filter((contact) => contact.id !== id);
+        setContacts(newContacts);
+    }
   return (
-    <div>
-        <div>
+    <div className={styles.container}>
+        <div className={styles.form}>
         {
             inputs.map((input , index) => (<input 
                 type={input.type} 
@@ -43,10 +49,11 @@ function Contacts() {
         }  
             <button onClick={addHandler }>Add Contact</button>
         </div>
-        <div>{alert && <p>{alert}</p>}</div>
-        <ContactList contacts={contacts}/>
+        <div className={styles.alert}>{alert && <p>{alert}</p>}</div>
+        <ContactList contacts={contacts}  deleteHandler={deleteHandler}/>
     </div>
   )
 }
+
 
 export default Contacts
